@@ -339,11 +339,18 @@ jobs:
                 "
 
               aws s3 cp s3-packages/$arch/APKINDEX.tar.gz \
-                s3://packages.vellum.delivery/$arch/APKINDEX.tar.gz
+                s3://packages.vellum.delivery/$arch/APKINDEX.tar.gz \
+                --cache-control "public, max-age=86400"
             fi
           done
 
           echo "Deploy complete!"
+
+      - name: Invalidate CloudFront APKINDEX cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths /aarch64/APKINDEX.tar.gz /armv7/APKINDEX.tar.gz
 
       - name: Generate and upload package metadata
         run: |

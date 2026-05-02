@@ -177,7 +177,8 @@ jobs:
         run: |
           for arch in aarch64 armv7; do
             aws s3 cp dist/noarch/ s3://packages.vellum.delivery/testing/$arch/ \
-              --recursive --exclude "APKINDEX.tar.gz"
+              --recursive --exclude "APKINDEX.tar.gz" \
+              --cache-control "no-cache, no-store, must-revalidate"
           done
 
   build-multiarch:
@@ -209,7 +210,8 @@ jobs:
         run: |
           if [ -d "dist/${{ matrix.arch }}" ] && ls dist/${{ matrix.arch }}/*.apk >/dev/null 2>&1; then
             aws s3 cp dist/${{ matrix.arch }}/ s3://packages.vellum.delivery/testing/${{ matrix.arch }}/ \
-              --recursive --exclude "APKINDEX.tar.gz"
+              --recursive --exclude "APKINDEX.tar.gz" \
+              --cache-control "no-cache, no-store, must-revalidate"
           fi
 
   remove-packages:
@@ -294,7 +296,8 @@ jobs:
               fi
 
               aws s3 cp s3-packages/$arch/APKINDEX.tar.gz \
-                s3://packages.vellum.delivery/testing/$arch/APKINDEX.tar.gz
+                s3://packages.vellum.delivery/testing/$arch/APKINDEX.tar.gz \
+                --cache-control "no-cache, no-store, must-revalidate"
             else
               echo "No packages in $arch, removing index..."
               aws s3 rm s3://packages.vellum.delivery/testing/$arch/APKINDEX.tar.gz || true
