@@ -300,6 +300,19 @@ vellum testing enable   # Enable testing repository
 vellum testing disable  # Disable testing repository
 ```
 
+## RSS Feeds
+
+Package update feeds are available at `https://packages.vellum.delivery/feeds/`:
+
+| Feed | Contents |
+|------|----------|
+| `all.rss` | All packages |
+| `rm1.rss` | reMarkable 1 |
+| `rm2.rss` | reMarkable 2 |
+| `rmpp.rss` | reMarkable Paper Pro |
+| `rmppmove.rss` | reMarkable Paper Pro Move |
+| `rmppure.rss` | reMarkable Paper Pure |
+
 ## License
 
 Individual packages retain their own licenses. Vellum infrastructure is MIT.
