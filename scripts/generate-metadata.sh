@@ -340,6 +340,20 @@ jq -s '
   )
 ' "$WORKDIR/old-metadata.json" "$METADATA_FILE" >tmp.json && mv tmp.json "$METADATA_FILE"
 
+# Compute first_released per package: preserve from old metadata, otherwise min(released)
+echo "Computing first_released per package..."
+jq -s '
+  .[0] as $old | .[1] |
+  .packages |= with_entries(
+    .key as $pkg |
+    ([($old.packages[$pkg] // {}) | .[].first_released? // empty] | if length > 0 then min else null end) as $old_first |
+    ([.value[].released] | min) as $computed_first |
+    .value |= with_entries(
+      .value.first_released = ($old_first // $computed_first)
+    )
+  )
+' "$WORKDIR/old-metadata.json" "$METADATA_FILE" >tmp.json && mv tmp.json "$METADATA_FILE"
+
 jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.generated = $ts' "$METADATA_FILE" >tmp.json && mv tmp.json "$METADATA_FILE"
 
 echo "Generated $METADATA_FILE"
