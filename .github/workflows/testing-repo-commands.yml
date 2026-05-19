@@ -24,8 +24,9 @@ jobs:
     steps:
       - name: Parse command
         id: parse
+        env:
+          COMMENT: ${{ github.event.comment.body }}
         run: |
-          COMMENT="${{ github.event.comment.body }}"
           if [[ "$COMMENT" == *"/publish-testing"* ]]; then
             echo "command=publish" >> $GITHUB_OUTPUT
           elif [[ "$COMMENT" == *"/unpublish-testing"* ]]; then
