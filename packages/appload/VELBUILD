@@ -1,9 +1,12 @@
+subpackages='
+launcherctl-appload:launcherctl_appload
+'
 maintainer="Mitchell Scott <mitchell@scottlabs.io>"
 pkgname=appload
 pkgver=0.5.3
-pkgrel=0
+pkgrel=1
 upstream_author="asivery"
-category="framework"
+category="launchers"
 pkgdesc="XOVI extension for windowed and fullscreen apps"
 url="https://github.com/asivery/rm-appload"
 arch="aarch64 armv7"
@@ -15,6 +18,10 @@ source="
 https://github.com/$upstream_author/rm-appload/releases/download/v$pkgver/appload-aarch64.zip
 https://github.com/$upstream_author/rm-appload/releases/download/v$pkgver/appload-arm32.zip
 https://raw.githubusercontent.com/$upstream_author/rm-appload/v$pkgver/LICENSE
+appload
+launcherctl.LICENSE
+launcherctl.prestart.sh
+launcherctl.prestock.sh
 "
 
 unpack() {
@@ -39,9 +46,46 @@ package() {
 		"$pkgdir"/home/root/.vellum/licenses/$pkgname/SOURCES
 }
 
+launcherctl_appload() {
+	pkgdesc="Launcherctl configuration for appload"
+	category="utilities"
+	license="MIT"
+	depends="
+    appload
+    launcherctl
+    "
+	package() {
+		install -o root -g root -Dm755 -t "$subpkgdir"/home/root/.vellum/share/launcherctl \
+			"$srcdir/appload"
+		install -o root -g root -Dm755 -t "$subpkgdir"/home/root/xovi/scripts/pre-start \
+			"$srcdir/launcherctl.prestart.sh"
+		install -o root -g root -Dm755 -t "$subpkgdir"/home/root/xovi/scripts/pre-stock \
+			"$srcdir/launcherctl.prestock.sh"
+		install -Dm644 "$srcdir/launcherctl.LICENSE" \
+			"$subpkgdir/home/root/.vellum/licenses/$subpkgname/LICENSE"
+		echo "https://github.com/vellum-dev/vellum" > \
+			"$subpkgdir/home/root/.vellum/licenses/$subpkgname/SOURCES"
+	}
+
+	predeinstall() {
+		set -e
+		if [[ "$(/home/root/.vellum/bin/launcherctl current-launcher)" == "appload" ]]; then
+			/home/root/.vellum/bin/launcherctl switch-launcher none
+		fi
+	}
+}
+
 sha512sums='9ff48f5b5ebcf134ce4f212ea812dfc17dc35daf0630316dd3ec2e332efe479eba25643d7e24d54e7410208f49bdedd4da1378cdef788da161879d7324a04929
 appload-aarch64.zip
 a507cbd38079919599cc33d299ac991cbac3974633744133edb0f8761008e0f2320c701a9b433ca74c71610fc79a8b5307ed5a57680d42edad9bc05084dc986c
 appload-arm32.zip
 d361e5e8201481c6346ee6a886592c51265112be550d5224f1a7a6e116255c2f1ab8788df579d9b8372ed7bfd19bac4b6e70e00b472642966ab5b319b99a2686
-LICENSE'
+LICENSE
+1816f99196578bc7a727a9c9a122bcf8fab41d5a59245e99d3afd98eb296010dbf607468ff3c9a01fc677d7f82051966df885e0602914aab6a47861e7a36fa98
+appload
+d853404bc152a92924de9fa73ede98f4a739404cd8e8721c4b7d6e62493e3035015838533b18781fca5d93aa1fa67bd042b8ead91e88a70aad6bd8186d3317f9
+launcherctl.LICENSE
+0484e645348bd9cb3aff5bddb00e14d6c32107359fb8ea95292b653afcf956127e174583666e2a6028f43f3dfde01cdc0dc36e0ba5238f0d623bd5db07fbcfaf
+launcherctl.prestart.sh
+908bcfb522cf1a1ab5613f4a007c94d994987ea1af1650e3baa51f618ebedfe2827cbac0f5832a2a91766f5ef03f0188fed242e1fd28c2373ae409b6c11d69d7
+launcherctl.prestock.sh'
